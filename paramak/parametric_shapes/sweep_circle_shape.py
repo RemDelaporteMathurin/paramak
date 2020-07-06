@@ -150,3 +150,5 @@ class SweepCircleShape(Shape):
         self.solid = solid_0
 
         return solid_0
+
+    # add azimuth_placement_angle
