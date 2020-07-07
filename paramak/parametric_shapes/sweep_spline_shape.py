@@ -8,9 +8,9 @@ from paramak import Shape
 
 from hashlib import blake2b
 
-# segmentation fault returned when workplanes are switched
+# check for segmentation fault
 
-class SweepStraightShape(Shape):
+class SweepSplineShape(Shape):
     """Insert docstring"""
 
     def __init__(
@@ -111,34 +111,20 @@ class SweepStraightShape(Shape):
         path = cq.Workplane(self.path_workplane).spline(self.path_points)
         distance = float(self.path_points[-1][1] - self.path_points[0][1])
 
-        # we create a workplane,
-        # move to the start path point
-        # create a new workplane with an origin at this point
-        # create the 2D shape
-        # move back to the origin of the original workplane, -self.path_points[0][0]
-        # create a new workplane offset by distance
-        # move to the end path point
-        # create a new workplane with an origin at this point
-        # create the 2D shape again
-
         solid = (
             cq.Workplane(self.workplane)
             .moveTo(self.path_points[0][0], 0)
             .workplane()
-            .polyline(self.points)
+            .spline(listOfXYTuple=list(self.points))
             .close()
             .moveTo(-self.path_points[0][0], 0)
             .workplane(offset=distance)
             .moveTo(self.path_points[-1][0], 0)
             .workplane()
-            .polyline(self.points)
+            .spline(listOfXYTuple=list(self.points))
             .close()
             .sweep(path, multisection=True)
         )
-
-        # the spline defines the path between the first point of each 2D shape in each plane
-        # i.e. the spline connects the 'same point' in each 2D shape
-        # the start and end spline points define the 'origin' of the 2D shape so the shape should have the start point of (0, 0)
 
         # Checks if the azimuth_placement_angle is a list of angles
         if isinstance(self.azimuth_placement_angle, Iterable):
@@ -167,6 +153,3 @@ class SweepStraightShape(Shape):
         self.solid = solid
 
         return solid
-
-
-

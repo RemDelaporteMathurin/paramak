@@ -8,9 +8,9 @@ from paramak import Shape
 
 from hashlib import blake2b
 
-# segmentation fault returned when workplanes are switched
+# check segmentation fault
 
-class SweepStraightShape(Shape):
+class SweepMixedShape(Shape):
     """Insert docstring"""
 
     def __init__(
@@ -111,34 +111,57 @@ class SweepStraightShape(Shape):
         path = cq.Workplane(self.path_workplane).spline(self.path_points)
         distance = float(self.path_points[-1][1] - self.path_points[0][1])
 
-        # we create a workplane,
-        # move to the start path point
-        # create a new workplane with an origin at this point
-        # create the 2D shape
-        # move back to the origin of the original workplane, -self.path_points[0][0]
-        # create a new workplane offset by distance
-        # move to the end path point
-        # create a new workplane with an origin at this point
-        # create the 2D shape again
+        # obtains the first two values of the points list
+        XZ_points = [(p[0], p[1]) for p in self.points]
 
-        solid = (
-            cq.Workplane(self.workplane)
-            .moveTo(self.path_points[0][0], 0)
-            .workplane()
-            .polyline(self.points)
-            .close()
-            .moveTo(-self.path_points[0][0], 0)
-            .workplane(offset=distance)
-            .moveTo(self.path_points[-1][0], 0)
-            .workplane()
-            .polyline(self.points)
-            .close()
-            .sweep(path, multisection=True)
-        )
+        # obtains the last values of the points list
+        connections = [p[2] for p in self.points[:-1]]
 
-        # the spline defines the path between the first point of each 2D shape in each plane
-        # i.e. the spline connects the 'same point' in each 2D shape
-        # the start and end spline points define the 'origin' of the 2D shape so the shape should have the start point of (0, 0)
+        current_linetype = connections[0]
+        current_points_list = []
+        instructions = []
+        # groups together common connection types
+        for i, c in enumerate(connections):
+            if c == current_linetype:
+                current_points_list.append(XZ_points[i])
+            else:
+                current_points_list.append(XZ_points[i])
+                instructions.append({current_linetype: current_points_list})
+                current_linetype = c
+                current_points_list = [XZ_points[i]]
+        instructions.append({current_linetype: current_points_list})
+
+        if list(instructions[-1].values())[0][-1] != XZ_points[0]:
+            keyname = list(instructions[-1].keys())[0]
+            instructions[-1][keyname].append(XZ_points[0])
+
+        solid = cq.Workplane(self.workplane).moveTo(self.path_points[0][0], 0).workplane()
+
+        for entry in instructions:
+            if list(entry.keys())[0] == "spline":
+                solid = solid.spline(listOfXYTuple=list(entry.values())[0])
+            if list(entry.keys())[0] == "straight":
+                solid = solid.polyline(list(entry.values())[0])
+            if list(entry.keys())[0] == "circle":
+                p0 = list(entry.values())[0][0]
+                p1 = list(entry.values())[0][1]
+                p2 = list(entry.values())[0][2]
+                solid = solid.moveTo(p0[0],p0[1]).threePointArc(p1, p2)
+
+        solid = solid.close().moveTo(-self.path_points[0][0], 0).workplane(offset=distance).moveTo(self.path_points[-1][0], 0).workplane()
+
+        for entry in instructions:
+            if list(entry.keys())[0] == "spline":
+                solid = solid.spline(listOfXYTuple=list(entry.values())[0])
+            if list(entry.keys())[0] == "straight":
+                solid = solid.polyline(list(entry.values())[0])
+            if list(entry.keys())[0] == "circle":
+                p0 = list(entry.values())[0][0]
+                p1 = list(entry.values())[0][1]
+                p2 = list(entry.values())[0][2]
+                solid = solid.moveTo(p0[0],p0[1]).threePointArc(p1, p2)
+
+        solid = solid.close().sweep(path, multisection=True)
 
         # Checks if the azimuth_placement_angle is a list of angles
         if isinstance(self.azimuth_placement_angle, Iterable):
@@ -167,6 +190,3 @@ class SweepStraightShape(Shape):
         self.solid = solid
 
         return solid
-
-
-
