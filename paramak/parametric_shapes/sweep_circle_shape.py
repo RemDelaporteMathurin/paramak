@@ -134,21 +134,51 @@ class SweepCircleShape(Shape):
 
     def create_solid(self):
 
+        # Creates hash value for current solid
+        self.hash_value = self.get_hash()
+
+        # at the moment, this simply uses the start and end points of the spline to position the faces
+
         path = cq.Workplane(self.path_workplane).spline(self.path_points)
         distance = float(self.path_points[-1][1] - self.path_points[0][1])
 
-        solid_0 = (
+        solid = (
             cq.Workplane(self.workplane)
             .moveTo(self.path_points[0][0], 0)
+            .workplane()
             .circle(self.radius)
+            .moveTo(-self.path_points[0][0], 0)
             .workplane(offset=distance)
             .moveTo(self.path_points[-1][0], 0)
+            .workplane()
             .circle(self.radius)
             .sweep(path, multisection=True)
         )
 
-        self.solid = solid_0
+        # Checks if the azimuth_placement_angle is a list of angles
+        if isinstance(self.azimuth_placement_angle, Iterable):
+            rotated_solids = []
+            # Perform seperate rotations for each angle
+            for angle in self.azimuth_placement_angle:
+                rotated_solids.append(solid.rotate((0, 0, -1), (0, 0, 1), angle))
+            solid = cq.Workplane(self.workplane)
 
-        return solid_0
+            # Joins the seperate solids together
+            for i in rotated_solids:
+                solid = solid.union(i)
+        else:
+            # Peform rotations for a single azimuth_placement_angle angle
+            solid = solid.rotate((0, 0, 1), (0, 0, -1), self.azimuth_placement_angle)
 
-    # add azimuth_placement_angle
+        # If a cut solid is provided then perform a boolean cut
+        if self.cut is not None:
+            # Allows for multiple cuts to be applied
+            if isinstance(self.cut, Iterable):
+                for cutting_solid in self.cut:
+                    solid = solid.cut(cutting_solid.solid)
+            else:
+                solid = solid.cut(self.cut.solid)
+
+        self.solid = solid
+
+        return solid
