@@ -135,7 +135,7 @@ class SweepMixedShape(Shape):
             keyname = list(instructions[-1].keys())[0]
             instructions[-1][keyname].append(XZ_points[0])
 
-        solid = cq.Workplane(self.workplane).moveTo(self.path_points[0][0], 0).workplane()
+        solid = cq.Workplane(self.workplane).workplane(offset=self.path_points[0][1]).moveTo(self.path_points[0][0], 0).workplane()
 
         for entry in instructions:
             if list(entry.keys())[0] == "spline":

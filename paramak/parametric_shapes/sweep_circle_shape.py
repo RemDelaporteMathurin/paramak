@@ -144,6 +144,7 @@ class SweepCircleShape(Shape):
 
         solid = (
             cq.Workplane(self.workplane)
+            .workplane(offset=self.path_points[0][1])   # moves to the correct start 'height'
             .moveTo(self.path_points[0][0], 0)
             .workplane()
             .circle(self.radius)

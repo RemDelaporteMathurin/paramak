@@ -123,6 +123,7 @@ class SweepStraightShape(Shape):
 
         solid = (
             cq.Workplane(self.workplane)
+            .workplane(offset=self.path_points[0][1])
             .moveTo(self.path_points[0][0], 0)
             .workplane()
             .polyline(self.points)
