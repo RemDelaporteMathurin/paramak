@@ -111,15 +111,11 @@ class SweepStraightShape(Shape):
         path = cq.Workplane(self.path_workplane).spline(self.path_points)
         distance = float(self.path_points[-1][1] - self.path_points[0][1])
 
-        # we create a workplane,
-        # move to the start path point
-        # create a new workplane with an origin at this point
-        # create the 2D shape
-        # move back to the origin of the original workplane, -self.path_points[0][0]
-        # create a new workplane offset by distance
-        # move to the end path point
-        # create a new workplane with an origin at this point
-        # create the 2D shape again
+        # NEED TO FIX THIS
+        # SOME WORKPLANE ORIENTATIONS REQUIRE OFFSET TO BE NEGATIVE
+        # Working progress
+        # if self.workplane == "XZ":
+        #     distance = -distance
 
         solid = (
             cq.Workplane(self.workplane)
@@ -137,9 +133,7 @@ class SweepStraightShape(Shape):
             .sweep(path, multisection=True)
         )
 
-        # the spline defines the path between the first point of each 2D shape in each plane
-        # i.e. the spline connects the 'same point' in each 2D shape
-        # the start and end spline points define the 'origin' of the 2D shape so the shape should have the start point of (0, 0)
+        # NEED TO FIX THIS
 
         # Checks if the azimuth_placement_angle is a list of angles
         if isinstance(self.azimuth_placement_angle, Iterable):
@@ -147,7 +141,7 @@ class SweepStraightShape(Shape):
             # Perform seperate rotations for each angle
             for angle in self.azimuth_placement_angle:
                 rotated_solids.append(solid.rotate((0, 0, -1), (0, 0, 1), angle))
-            solid = cq.Workplane(self.workplane)
+            solid = cq.Workplane(self.path_workplane)   # think this should be self.path_workplane as we don't want to rotate in the plane of the face
 
             # Joins the seperate solids together
             for i in rotated_solids:
@@ -168,6 +162,3 @@ class SweepStraightShape(Shape):
         self.solid = solid
 
         return solid
-
-
-

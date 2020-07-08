@@ -111,6 +111,9 @@ class SweepMixedShape(Shape):
         path = cq.Workplane(self.path_workplane).spline(self.path_points)
         distance = float(self.path_points[-1][1] - self.path_points[0][1])
 
+        # NEED TO FIX THIS
+        # SOME WORKPLANE ORIENTATIONS REQUIRE OFFSET TO BE NEGATIVE
+
         # obtains the first two values of the points list
         XZ_points = [(p[0], p[1]) for p in self.points]
 
@@ -163,13 +166,15 @@ class SweepMixedShape(Shape):
 
         solid = solid.close().sweep(path, multisection=True)
 
+        # NEED TO FIX THIS
+
         # Checks if the azimuth_placement_angle is a list of angles
         if isinstance(self.azimuth_placement_angle, Iterable):
             rotated_solids = []
             # Perform seperate rotations for each angle
             for angle in self.azimuth_placement_angle:
                 rotated_solids.append(solid.rotate((0, 0, -1), (0, 0, 1), angle))
-            solid = cq.Workplane(self.workplane)
+            solid = cq.Workplane(self.path_workplane)   # think this should be self.path_workplane as we don't want to rotate in the plane of the face
 
             # Joins the seperate solids together
             for i in rotated_solids:
