@@ -100,6 +100,55 @@ ExtrudeCircleShape()
    :members:
    :show-inheritance:
 
+SweepStraightShape()
+^^^^^^^^^^^^^^^^^^^^
+
+.. image:: https://user-images.githubusercontent.com/56687624/86926740-565dda80-c12a-11ea-90c3-860dbb6b9332.png
+   :width: 250
+   :height: 180
+   :align: center
+
+.. automodule:: paramak.parametric_shapes.sweep_straight_shape
+   :members:
+   :show-inheritance:
+
+SweepSplineShape()
+^^^^^^^^^^^^^^^^^^
+
+.. image:: https://user-images.githubusercontent.com/56687624/86918521-bfd7ec00-c11e-11ea-8420-3ef68976dcf6.png
+   :width: 250
+   :height: 180
+   :align: center
+
+.. automodule:: paramak.parametric_shapes.sweep_spline_shape
+   :members:
+   :show-inheritance:
+
+SweepMixedShape()
+^^^^^^^^^^^^^^^^^
+
+.. image:: https://user-images.githubusercontent.com/56687624/86918512-bd759200-c11e-11ea-912b-93549c570def.png
+   :width: 250
+   :height: 180
+   :align: center
+
+.. automodule:: paramak.parametric_shapes.sweep_mixed_shape
+   :members:
+   :show-inheritance:
+
+SweepCircleShape()
+^^^^^^^^^^^^^^^^^^
+
+.. image:: https://user-images.githubusercontent.com/56687624/86926474-04b55000-c12a-11ea-8070-df52687f2d8f.png
+   :width: 250
+   :height: 180
+   :align: center
+
+.. automodule:: paramak.parametric_shapes.sweep_circle_shape
+   :members:
+   :show-inheritance:
+
+
 Other modules
 -------------
 
