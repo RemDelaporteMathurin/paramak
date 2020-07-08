@@ -133,6 +133,12 @@ class SweepCircleShape(Shape):
         return value
 
     def create_solid(self):
+        """Creates a 3d solid by sweeping a 2D shape created from circular connections
+        along a defined spline
+
+        :return: a 3d solid volume
+        :rtype: a CadQuery solid
+        """
 
         # Creates hash value for current solid
         self.hash_value = self.get_hash()

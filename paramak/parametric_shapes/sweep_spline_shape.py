@@ -11,7 +11,34 @@ from hashlib import blake2b
 # check for segmentation fault
 
 class SweepSplineShape(Shape):
-    """Insert docstring"""
+    """Sweeps a 2D shape created from points connected with splines along a
+       defined spline to create a 3D CadQuery solid.
+
+       :param points: A list of XY, YZ or XZ coordinates connected by spline connections which 
+           define the 2D shape to be swept
+       :type points: a list of tuples
+       :param path_points: A list of XY, YZ or XZ coordinates which define the spline path along
+            which the 2D shape is swept
+       :type path_points: a list of tuples
+       :param workplane: Workplane in which the 2D shape to be swept is defined
+       :type workplane: str
+       :param path_workplane: Workplane in which the spline path is defined
+       :type path_workplane: str
+       :param stp_filename: the filename used when saving stp files as part of a reactor
+       :type stp_filename: str
+       :param color: the color to use when exporting as html graphs or png images
+       :type color: Red, Green, Blue, [Alpha] values. RGB and RGBA are sequences of,
+           3 or 4 floats respectively each in the range 0-1
+       :param azimuth_placement_angle: the angle or angles to use when rotating the 
+           shape on the azimuthal axis
+       :type azimuth_placement_angle: float or iterable of floats
+       :param cut: An optional cadquery object to perform a boolean cut with this object
+       :type cut: cadquery object
+       :param material_tag: The material name to use when exporting the neutronics description
+       :type material_tag: str
+       :param name: The legend name used when exporting a html graph of the shape
+       :type name: str
+    """
 
     def __init__(
         self,
@@ -104,6 +131,12 @@ class SweepSplineShape(Shape):
         return value
 
     def create_solid(self):
+        """Creates a 3d solid by sweeping a 2D shape created from points and spline connections
+        along a defined spline
+
+        :return: a 3d solid volume
+        :rtype: a CadQuery solid
+        """
 
         # Creates hash value for current solid
         self.hash_value = self.get_hash()
